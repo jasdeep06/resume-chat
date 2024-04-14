@@ -19,7 +19,7 @@ app = FastAPI()
 # logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 # logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
-Settings.llm = OpenAI(model='gpt-3.5-turbo')
+Settings.llm = OpenAI(model='gpt-4-turbo-preview')
 Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-large")
 
 def description_json_to_str(description):
@@ -84,22 +84,34 @@ def init_index():
             )
     
     query_engine = RouterQueryEngine(
-    selector=LLMMultiSelector.from_defaults(llm=OpenAI(model='gpt-4-turbo-preview')),
+    selector=LLMMultiSelector.from_defaults(llm=OpenAI(model='gpt-4-turbo-preview'),max_outputs=2),
     query_engine_tools=[tool_dict[key] for key in tool_dict.keys()],
     verbose=True
     )
     return query_engine
 
+def get_images_from_source_nodes(source_nodes):
+    images = []
+    for node in source_nodes:
+        if "path" in node.metadata.keys():
+            images.append(node.metadata["path"].split("\\")[-1] + ".png")
+    return images
+
+
 engine = init_index()
 
 @app.get("/query")
 def query_engine(query:str):
+    query += "Answer in detail from the context provided. If there are any relevant urls in the context, please provide them as well."
     try:
-        response = str(engine.query(query))
+        response = engine.query(query)
+        images = get_images_from_source_nodes(response.source_nodes)
+        print(response.source_nodes)
     except ValueError:
         response = "The given question cannot be answered using the provided context."
+        images = []
 
-    return {"response":str(response)}
+    return {"response":str(response),'images':images}
 
 # if __name__ == '__main__':
 #     index_dict,description_dict = create_index_and_description_dict()

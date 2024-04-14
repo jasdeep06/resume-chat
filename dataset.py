@@ -78,6 +78,7 @@ def parse_and_cache_resume(json_path):
 
     #keys as individual cache paths and data.pkl as the value in parsed path
     for key in resume_json.keys():
+
         #individual cache path
         cache_path = os.path.join('cache',parent_dir,key)
 

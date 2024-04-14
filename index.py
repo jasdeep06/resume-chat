@@ -196,11 +196,12 @@ def create_index_resume(cache_path,overwrite_index=False):
 
 
 def init_pdfs():
-    folders_of_interest = ['blogposts','experience-blogs']
+    # folders_of_interest = ['blogposts','experience-blogs']
+    folders_of_interest = ['experience-blogs']
     for folder in folders_of_interest:
         sub_folders = os.listdir(os.path.join('cache',folder))
         for sub_folder in sub_folders:
-            create_index(os.path.join('cache',folder,sub_folder),overwrite_image_nodes=True)
+            create_index(os.path.join('cache',folder,sub_folder),overwrite_image_nodes=True,overwrite_index=True)
             print("Index created for: ",sub_folder)
 
 def init_resume():
@@ -208,6 +209,8 @@ def init_resume():
     for folder in folders_of_interest:
         sub_folders = os.listdir(os.path.join('cache',folder))
         for sub_folder in sub_folders:
+            if sub_folder != 'skills':
+                continue
             create_index_resume(os.path.join('cache',folder,sub_folder),overwrite_index=True)
             print("Index created for: ",sub_folder)
 
