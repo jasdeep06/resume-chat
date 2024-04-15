@@ -106,7 +106,6 @@ def query_engine(query:str):
     try:
         response = engine.query(query)
         images = get_images_from_source_nodes(response.source_nodes)
-        print(response.source_nodes)
     except ValueError:
         response = "The given question cannot be answered using the provided context."
         images = []
